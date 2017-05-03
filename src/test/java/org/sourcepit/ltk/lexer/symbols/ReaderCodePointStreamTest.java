@@ -1,4 +1,4 @@
-package org.sourcepit.ltk.lexer;
+package org.sourcepit.ltk.lexer.symbols;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import org.junit.Test;
+import org.sourcepit.ltk.lexer.symbols.CodePointStream;
+import org.sourcepit.ltk.lexer.symbols.ReaderCodePointStream;
 
 public class ReaderCodePointStreamTest {
 

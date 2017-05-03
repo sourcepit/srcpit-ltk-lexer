@@ -1,4 +1,4 @@
-package org.sourcepit.ltk.lexer;
+package org.sourcepit.ltk.lexer.symbols;
 
 import java.io.Closeable;
 import java.io.IOException;
