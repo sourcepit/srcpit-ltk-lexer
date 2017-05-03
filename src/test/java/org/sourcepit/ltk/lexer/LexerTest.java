@@ -1,13 +1,16 @@
 package org.sourcepit.ltk.lexer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.plaf.multi.MultiRootPaneUI;
+
 import org.junit.Test;
 import org.sourcepit.ltk.lexer.rules.LexerRule;
+import org.sourcepit.ltk.lexer.rules.Multi;
 import org.sourcepit.ltk.lexer.rules.SymbolSequenz;
 import org.sourcepit.ltk.lexer.symbols.Eof;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
@@ -32,6 +35,19 @@ public class LexerTest {
 		assertEquals("if", asString(lexer.next()));
 		assertEquals(" ", asString(lexer.next()));
 		assertEquals("else", asString(lexer.next()));
+		assertEquals("<EOF>", asString(lexer.next()));
+	}
+	
+	@Test
+	public void testMultiRule() throws Exception {
+		List<LexerRule> rules = new ArrayList<>();
+		rules.add(new Multi(SymbolSequenz.valueOf("a")));
+		rules.add(SymbolSequenz.valueOf(Eof.get()));
+		
+		SymbolStream symbolStream = new UnicodeCharacterStream(new StringReader("aaaa"));
+
+		Lexer lexer = new Lexer(rules, symbolStream);
+		assertEquals("aaaa", asString(lexer.next()));
 		assertEquals("<EOF>", asString(lexer.next()));
 	}
 

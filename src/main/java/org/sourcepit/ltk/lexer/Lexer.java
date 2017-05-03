@@ -25,12 +25,9 @@ public class Lexer {
 	}
 
 	public Symbol[] next() throws IOException {
-
 		Symbol symbol = symbolBuffer.next();
-
 		final List<Symbol> buffer = new ArrayList<Symbol>();
 		buffer.add(symbol);
-
 		do {
 			LexemeRef lexemeRef = rule.onSymbol(null, buffer, 0, buffer.size(), symbol);
 			LexemeState state = lexemeRef.getState();
@@ -48,10 +45,7 @@ public class Lexer {
 			default:
 				throw new IllegalStateException();
 			}
-
-		} while (!Eof.get().equals(symbol));
-
-		return null;
+		} while (true);
 	}
 
 }
