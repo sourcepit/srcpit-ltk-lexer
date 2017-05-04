@@ -1,12 +1,10 @@
 package org.sourcepit.ltk.lexer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.plaf.multi.MultiRootPaneUI;
 
 import org.junit.Test;
 import org.sourcepit.ltk.lexer.rules.LexerRule;
@@ -41,13 +39,27 @@ public class LexerTest {
 	@Test
 	public void testMultiRule() throws Exception {
 		List<LexerRule> rules = new ArrayList<>();
-		rules.add(new Multi(SymbolSequenz.valueOf("a")));
+		rules.add(new Multi(SymbolSequenz.valueOf("ab")));
 		rules.add(SymbolSequenz.valueOf(Eof.get()));
 		
-		SymbolStream symbolStream = new UnicodeCharacterStream(new StringReader("aaaa"));
+		SymbolStream symbolStream = new UnicodeCharacterStream(new StringReader("abab"));
 
 		Lexer lexer = new Lexer(rules, symbolStream);
-		assertEquals("aaaa", asString(lexer.next()));
+		assertEquals("abab", asString(lexer.next()));
+		assertEquals("<EOF>", asString(lexer.next()));
+	}
+	
+	@Test
+	public void testNestedMulti() throws Exception {
+		
+		List<LexerRule> rules = new ArrayList<>();
+		rules.add(new Multi(new Multi(new Multi(SymbolSequenz.valueOf("abab")))));
+		rules.add(SymbolSequenz.valueOf(Eof.get()));
+		
+		SymbolStream symbolStream = new UnicodeCharacterStream(new StringReader("abab"));
+
+		Lexer lexer = new Lexer(rules, symbolStream);
+		assertEquals("abab", asString(lexer.next()));
 		assertEquals("<EOF>", asString(lexer.next()));
 	}
 

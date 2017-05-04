@@ -8,7 +8,6 @@ import org.sourcepit.ltk.lexer.rules.LexemeRef;
 import org.sourcepit.ltk.lexer.rules.LexemeState;
 import org.sourcepit.ltk.lexer.rules.LexerRule;
 import org.sourcepit.ltk.lexer.rules.Or;
-import org.sourcepit.ltk.lexer.symbols.Eof;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 import org.sourcepit.ltk.lexer.symbols.SymbolBuffer;
 import org.sourcepit.ltk.lexer.symbols.SymbolStream;

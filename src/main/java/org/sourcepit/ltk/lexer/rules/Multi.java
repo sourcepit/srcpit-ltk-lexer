@@ -18,36 +18,43 @@ public class Multi implements LexerRule {
 
 	@Override
 	public LexemeRef onSymbol(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
-
-		if (length == 1) {
-			matchCount = 0;
-			childOffset = 0;
-			childLength = 1;
-		}
-
 		if (prev.getState() == LexemeState.INCOMPLETE) {
-			final LexemeRef lexemeRef = childRule.onSymbol(prev, buff, childOffset, childLength, symbol);
-			final LexemeState state = lexemeRef.getState();
-			switch (state) {
-			case INCOMPLETE:
-				return new LexemeRef(this, LexemeState.INCOMPLETE, offset, length);
-			case TERMINATED:
-				matchCount++;
-				childOffset = 0;
+			if (length == 1) {
+				matchCount = 0;
+				childOffset = offset;
 				childLength = 1;
-				return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeRef.getOffset(), lexemeRef.getLength());
-			case DISCARDED:
-				if (length == 1) {
-					return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
-				} else {
-					return new LexemeRef(this, LexemeState.TERMINATED, offset, length - 1);
-				}
-			default:
-				throw new IllegalStateException();
 			}
+			return internalOnSymbol(prev, buff, offset, length, symbol);
+		} else {
+			return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
 		}
+	}
 
-		return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
+	private LexemeRef internalOnSymbol(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
+		final LexemeRef lexemeRef = childRule.onSymbol(prev, buff, childOffset, childLength, symbol);
+		final LexemeState state = lexemeRef.getState();
+		switch (state) {
+		case INCOMPLETE:
+			childLength++;
+			return new LexemeRef(this, LexemeState.INCOMPLETE, offset, length);
+		case TERMINATED:
+			matchCount++;
+			childOffset += lexemeRef.getLength();
+			childLength = 1;
+			if (lexemeRef.getOffset() + lexemeRef.getLength() < length) {
+				return internalOnSymbol(lexemeRef, buff, offset, length, symbol);
+			} else {
+				return new LexemeRef(this, LexemeState.INCOMPLETE, offset, length);
+			}
+		case DISCARDED:
+			if (length == 1) {
+				return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
+			} else {
+				return new LexemeRef(this, LexemeState.TERMINATED, offset, length - 1);
+			}
+		default:
+			throw new IllegalStateException();
+		}
 	}
 
 }
