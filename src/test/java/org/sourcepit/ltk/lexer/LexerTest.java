@@ -70,4 +70,8 @@ public class LexerTest {
 		}
 		return sb.toString();
 	}
+	
+	public static UnicodeCharacterStream asSymbolStream(String input) {
+		return new UnicodeCharacterStream(new StringReader(input));
+	}
 }
