@@ -24,7 +24,7 @@ public final class LexerRules {
 	private LexerRules() {
 		super();
 	}
-	
+
 	public static LexerRule word(String word) {
 		return SymbolSequenz.valueOf(word);
 	}
@@ -34,17 +34,17 @@ public final class LexerRules {
 	}
 
 	public static LexerRule quantified(LexerRule rule, int min, int max) {
-		return new Multi(rule);
+		return new Quantification(rule, min, max);
 	}
-	
+
 	public static LexerRule group(LexerRule... rules) {
 		return new Group(Arrays.asList(rules));
 	}
-	
+
 	public static LexerRule anyChar() {
 		return new AnyUnicodeCharacter();
 	}
-	
+
 	public static LexerRule eof() {
 		return SymbolSequenz.valueOf(Eof.get());
 	}

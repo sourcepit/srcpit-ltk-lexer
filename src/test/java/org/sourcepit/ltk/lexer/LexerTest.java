@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.sourcepit.ltk.lexer.rules.LexerRule;
-import org.sourcepit.ltk.lexer.rules.Multi;
+import org.sourcepit.ltk.lexer.rules.Quantification;
 import org.sourcepit.ltk.lexer.rules.SymbolSequenz;
 import org.sourcepit.ltk.lexer.symbols.Eof;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
@@ -37,9 +37,9 @@ public class LexerTest {
 	}
 	
 	@Test
-	public void testMultiRule() throws Exception {
+	public void testQuantification() throws Exception {
 		List<LexerRule> rules = new ArrayList<>();
-		rules.add(new Multi(SymbolSequenz.valueOf("ab")));
+		rules.add(new Quantification(SymbolSequenz.valueOf("ab")));
 		rules.add(SymbolSequenz.valueOf(Eof.get()));
 		
 		SymbolStream symbolStream = new UnicodeCharacterStream(new StringReader("abab"));
@@ -50,10 +50,10 @@ public class LexerTest {
 	}
 	
 	@Test
-	public void testNestedMulti() throws Exception {
+	public void testNestedQuantification() throws Exception {
 		
 		List<LexerRule> rules = new ArrayList<>();
-		rules.add(new Multi(new Multi(new Multi(SymbolSequenz.valueOf("abab")))));
+		rules.add(new Quantification(new Quantification(new Quantification(SymbolSequenz.valueOf("abab")))));
 		rules.add(SymbolSequenz.valueOf(Eof.get()));
 		
 		SymbolStream symbolStream = new UnicodeCharacterStream(new StringReader("abab"));
