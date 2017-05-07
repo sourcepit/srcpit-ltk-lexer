@@ -41,10 +41,10 @@ public class Group implements LexerRule {
 			rule = rules.get(ruleIndex);
 		}
 
-		return loop(prev, buff, length, symbol);
+		return loop(prev, buff, offset, length, symbol);
 	}
 
-	private LexemeRef loop(LexemeRef prev, List<Symbol> buff, int length, Symbol symbol) {
+	private LexemeRef loop(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
 		if (ruleIndex == rules.size()) {
 			return new LexemeRef(this, LexemeState.DISCARDED, 0, length);
 		}
@@ -54,21 +54,21 @@ public class Group implements LexerRule {
 		final LexemeState state = lexemeRef.getState();
 		if (state == LexemeState.INCOMPLETE) {
 			ruleLength++;
-			return new LexemeRef(this, state, 0, length);
+			return new LexemeRef(this, state, offset, length);
 		}
 
 		if (state == LexemeState.DISCARDED) {
-			return new LexemeRef(this, state, 0, length);
+			return new LexemeRef(this, state, offset, length);
 		}
 
 		if (state == LexemeState.TERMINATED) {
 
-			final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength();
+			final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - offset;
 
 			ruleIndex++;
 
 			if (ruleIndex == rules.size()) {
-				return new LexemeRef(this, state, 0, actualLexLength);
+				return new LexemeRef(this, state, offset, actualLexLength);
 			}
 
 			rule = rules.get(ruleIndex);
@@ -76,13 +76,13 @@ public class Group implements LexerRule {
 			ruleLength = 1;
 
 			if (actualLexLength < length) {
-				ruleOffset = length - 1;
-				prev = new LexemeRef(this, LexemeState.INCOMPLETE, 0, actualLexLength);
-				return loop(prev, buff, ruleLength, symbol);
+				ruleOffset = offset + length - 1;
+				prev = new LexemeRef(this, LexemeState.INCOMPLETE, offset, actualLexLength);
+				return loop(prev, buff, offset, ruleLength, symbol);
 			}
 			else {
-				ruleOffset = length;
-				return new LexemeRef(this, LexemeState.INCOMPLETE, 0, actualLexLength);
+				ruleOffset = offset + length;
+				return new LexemeRef(this, LexemeState.INCOMPLETE, offset, actualLexLength);
 			}
 
 		}

@@ -16,7 +16,7 @@
 
 package org.sourcepit.ltk.lexer.rules;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.sourcepit.ltk.lexer.rules.LexerRules.group;
 import static org.sourcepit.ltk.lexer.rules.LexerRules.quantified;
 import static org.sourcepit.ltk.lexer.rules.LexerRules.word;
@@ -159,6 +159,33 @@ public class GroupTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(4, lex.getLength());
 
+	}
+	
+	@Test
+	public void testOffset() throws Exception {
+		setRule(group(word("a"), group(word("b")), word("c")));
+		setInput("xxabc", 2);
+		
+		next();
+
+		assertEquals(rule, lex.getRule());
+		assertEquals(LexemeState.INCOMPLETE, lex.getState());
+		assertEquals(2, lex.getOffset());
+		assertEquals(1, lex.getLength());
+		
+		next();
+
+		assertEquals(rule, lex.getRule());
+		assertEquals(LexemeState.INCOMPLETE, lex.getState());
+		assertEquals(2, lex.getOffset());
+		assertEquals(2, lex.getLength());
+		
+		next();
+
+		assertEquals(rule, lex.getRule());
+		assertEquals(LexemeState.TERMINATED, lex.getState());
+		assertEquals(2, lex.getOffset());
+		assertEquals(3, lex.getLength());
 	}
 
 }

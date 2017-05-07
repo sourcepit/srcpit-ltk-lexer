@@ -30,6 +30,7 @@ public abstract class AbstractLexerRuleTest {
 	protected LexemeRef prev;
 
 	protected List<Symbol> buff;
+	protected int offset = 0;
 	protected Symbol symbol;
 	protected LexemeRef lex;
 
@@ -41,17 +42,28 @@ public abstract class AbstractLexerRuleTest {
 		this.rule = rule;
 	}
 
-	protected void setInput(String input) {
-		lex = new LexemeRef(null, LexemeState.INCOMPLETE, 0, 0);
+	protected void setInput(String input) throws IOException {
+		setInput(input, 0);
+	}
+
+	protected void setInput(String input, int offset) throws IOException {
 		buff = new ArrayList<>();
 		symbolStream = asSymbolStream(input);
+
+		for (int i = 0; i < offset; i++) {
+			buff.add(symbolStream.next());
+		}
+
+		lex = new LexemeRef(null, offset == 0 ? LexemeState.INCOMPLETE : LexemeState.TERMINATED, 0, buff.size());
+
+		this.offset = offset;
 	}
 
 	protected void next() throws IOException {
 		prev = lex;
 		symbol = symbolStream.next();
 		buff.add(symbol);
-		lex = rule.onSymbol(prev, buff, 0, buff.size(), symbol);
+		lex = rule.onSymbol(prev, buff, offset, buff.size() - offset, symbol);
 	}
 
 }
