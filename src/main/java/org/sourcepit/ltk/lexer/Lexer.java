@@ -30,10 +30,9 @@ public class Lexer {
 		do {
 			LexemeRef lexemeRef = rule.onSymbol(null, buffer, 0, buffer.size(), symbol);
 			LexemeState state = lexemeRef.getState();
-
 			switch (state) {
 			case DISCARDED:
-				// errro
+				// error
 				return null;
 			case INCOMPLETE:
 				symbol = symbolBuffer.next();
