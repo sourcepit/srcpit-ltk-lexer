@@ -34,13 +34,17 @@ public class Group implements LexerRule {
 	@Override
 	public LexemeRef onSymbol(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
 
-		if (offset == 0 && length == 1) {
+		if (length == 1) {
 			ruleIndex = 0;
-			ruleOffset = 0;
+			ruleOffset = offset;
 			ruleLength = 1;
 			rule = rules.get(ruleIndex);
 		}
 
+		return loop(prev, buff, length, symbol);
+	}
+
+	private LexemeRef loop(LexemeRef prev, List<Symbol> buff, int length, Symbol symbol) {
 		if (ruleIndex == rules.size()) {
 			return new LexemeRef(this, LexemeState.DISCARDED, 0, length);
 		}
@@ -74,7 +78,7 @@ public class Group implements LexerRule {
 			if (actualLexLength < length) {
 				ruleOffset = length - 1;
 				prev = new LexemeRef(this, LexemeState.INCOMPLETE, 0, actualLexLength);
-				return onSymbol(prev, buff, ruleOffset, ruleLength, symbol);
+				return loop(prev, buff, ruleLength, symbol);
 			}
 			else {
 				ruleOffset = length;
