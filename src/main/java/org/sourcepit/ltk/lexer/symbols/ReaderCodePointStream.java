@@ -2,10 +2,15 @@ package org.sourcepit.ltk.lexer.symbols;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 
 public class ReaderCodePointStream implements CodePointStream {
 
 	private final Reader charSource;
+	
+	public static ReaderCodePointStream fromString(String str) {
+		return new ReaderCodePointStream(new StringReader(str));
+	}
 
 	public ReaderCodePointStream(Reader charSource) {
 		this.charSource = charSource;

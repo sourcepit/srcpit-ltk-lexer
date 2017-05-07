@@ -1,6 +1,10 @@
+
 package org.sourcepit.ltk.lexer.symbols;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import lombok.Value;
 
@@ -8,6 +12,21 @@ import lombok.Value;
 public final class UnicodeCharacter implements Symbol {
 
 	private final int codePoint;
+
+	public static List<UnicodeCharacter> toCharacters(String str) {
+		try (UnicodeCharacterStream stream = UnicodeCharacterStream.fromString(str)) {
+			final List<UnicodeCharacter> characters = new ArrayList<>(str.length());
+			Symbol s = stream.next();
+			while (s instanceof UnicodeCharacter) {
+				characters.add((UnicodeCharacter) s);
+				s = stream.next();
+			}
+			return characters;
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	public static UnicodeCharacter valueOf(int codePoint) {
 		return new UnicodeCharacter(codePoint);
