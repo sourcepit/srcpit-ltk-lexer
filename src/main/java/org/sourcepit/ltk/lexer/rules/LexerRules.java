@@ -19,6 +19,7 @@ package org.sourcepit.ltk.lexer.rules;
 import java.util.Arrays;
 
 import org.sourcepit.ltk.lexer.symbols.Eof;
+import org.sourcepit.ltk.lexer.symbols.UnicodeCharacter;
 
 public final class LexerRules {
 	private LexerRules() {
@@ -43,6 +44,10 @@ public final class LexerRules {
 
 	public static LexerRule anyChar() {
 		return new AnyUnicodeCharacter();
+	}
+
+	public static LexerRule noneOf(String chars) {
+		return new NoneOf(UnicodeCharacter.toCharacters(chars));
 	}
 
 	public static LexerRule eof() {
