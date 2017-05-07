@@ -46,6 +46,10 @@ public final class LexerRules {
 		return new AnyUnicodeCharacter();
 	}
 
+	public static LexerRule anyOf(String chars) {
+		return new AnyOf(UnicodeCharacter.toCharacters(chars));
+	}
+
 	public static LexerRule noneOf(String chars) {
 		return new NoneOf(UnicodeCharacter.toCharacters(chars));
 	}
