@@ -16,20 +16,22 @@ public abstract class AbstractLexerRule implements LexerRule {
 
 	protected Symbol currentSymbol;
 
-	@Override
-	public final LexemeRef onSymbol(List<Symbol> buff, int offset, int length, Symbol symbol) {
+	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
+		this.currentState = LexemeState.INCOMPLETE;
+		this.symbolBuffer = symbolBuffer;
+		this.lexemeStart = lexemeStart;
+	}
 
-		if (length == 1) {
-			init(buff, offset, length, symbol);
-		} else {
-			switch (currentState) {
-			case INCOMPLETE:
-				break;
-			case DISCARDED:
-			case TERMINATED:
-			default:
-				throw new IllegalStateException();
-			}
+	@Override
+	public final LexemeRef onSymbol(int length, Symbol symbol) {
+
+		switch (currentState) {
+		case INCOMPLETE:
+			break;
+		case DISCARDED:
+		case TERMINATED:
+		default:
+			throw new IllegalStateException();
 		}
 
 		lexemeLength = length;
@@ -40,14 +42,6 @@ public abstract class AbstractLexerRule implements LexerRule {
 		currentState = result.getState();
 
 		return result;
-	}
-
-	protected void init(List<Symbol> symbolBuffer, int lexemeStart, int lexemeLength, Symbol currentSymbol) {
-		this.currentState = LexemeState.INCOMPLETE;
-		this.symbolBuffer = symbolBuffer;
-		this.lexemeStart = lexemeStart;
-		this.lexemeLength = lexemeLength;
-		this.currentSymbol = currentSymbol;
 	}
 
 	protected abstract LexemeRef onSymbol();

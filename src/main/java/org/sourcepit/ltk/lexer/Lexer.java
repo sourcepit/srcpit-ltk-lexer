@@ -26,9 +26,10 @@ public class Lexer {
 	public Symbol[] next() throws IOException {
 		Symbol symbol = symbolBuffer.next();
 		final List<Symbol> buffer = new ArrayList<Symbol>();
+		rule.onStart(buffer, 0);
 		buffer.add(symbol);
 		do {
-			LexemeRef lexemeRef = rule.onSymbol(buffer, 0, buffer.size(), symbol);
+			LexemeRef lexemeRef = rule.onSymbol(buffer.size(), symbol);
 			LexemeState state = lexemeRef.getState();
 			switch (state) {
 			case DISCARDED:

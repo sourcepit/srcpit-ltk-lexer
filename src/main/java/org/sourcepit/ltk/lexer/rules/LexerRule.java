@@ -6,5 +6,7 @@ import org.sourcepit.ltk.lexer.symbols.Symbol;
 
 public interface LexerRule {
 
-	LexemeRef onSymbol(List<Symbol> buff, int offset, int length, Symbol symbol);
+	void onStart(List<Symbol> symbolBuffer, int lexemeStart);
+
+	LexemeRef onSymbol(int length, Symbol symbol);
 }

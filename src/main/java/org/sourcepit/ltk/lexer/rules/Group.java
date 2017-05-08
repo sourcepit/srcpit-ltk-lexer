@@ -32,8 +32,8 @@ public class Group extends AbstractLexerRule {
 	private LexerRule rule;
 
 	@Override
-	protected void init(List<Symbol> symbolBuffer, int lexemeStart, int lexemeLength, Symbol currentSymbol) {
-		super.init(symbolBuffer, lexemeStart, lexemeLength, currentSymbol);
+	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
+		super.onStart(symbolBuffer, lexemeStart);
 		ruleIndex = 0;
 		ruleOffset = lexemeStart;
 		ruleLength = 1;
@@ -46,7 +46,11 @@ public class Group extends AbstractLexerRule {
 			return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
 		}
 
-		final LexemeRef lexemeRef = rule.onSymbol(symbolBuffer, ruleOffset, ruleLength, currentSymbol);
+		if (ruleLength == 1) {
+			rule.onStart(symbolBuffer, ruleOffset);
+		}
+
+		final LexemeRef lexemeRef = rule.onSymbol(ruleLength, currentSymbol);
 
 		final LexemeState state = lexemeRef.getState();
 		if (state == LexemeState.INCOMPLETE) {

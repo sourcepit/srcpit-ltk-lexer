@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.sourcepit.ltk.lexer.symbols.Symbol;
+
 public class Or extends AbstractLexerRule {
 
 	private final List<LexerRule> rules;
@@ -25,6 +27,14 @@ public class Or extends AbstractLexerRule {
 	}
 
 	@Override
+	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
+		super.onStart(symbolBuffer, lexemeStart);
+		for (LexerRule rule : rules) {
+			rule.onStart(symbolBuffer, lexemeStart);
+		}
+	}
+
+	@Override
 	protected LexemeRef onSymbol() {
 		final List<LexemeRef> prevLexemeRefs;
 
@@ -38,8 +48,7 @@ public class Or extends AbstractLexerRule {
 		}
 
 		for (LexemeRef prevLexemeRef : prevLexemeRefs) {
-			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(symbolBuffer, lexemeStart, lexemeLength,
-					currentSymbol);
+			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(lexemeLength, currentSymbol);
 			LexemeState state = lexemeRef.getState();
 			switch (state) {
 			case DISCARDED:

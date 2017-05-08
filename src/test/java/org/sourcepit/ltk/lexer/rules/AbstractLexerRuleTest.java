@@ -59,8 +59,11 @@ public abstract class AbstractLexerRuleTest {
 
 	protected void next() throws IOException {
 		symbol = symbolStream.next();
+		if (buff.size() == offset) {
+			rule.onStart(buff, offset);
+		}
 		buff.add(symbol);
-		lex = rule.onSymbol(buff, offset, buff.size() - offset, symbol);
+		lex = rule.onSymbol(buff.size() - offset, symbol);
 	}
 
 }

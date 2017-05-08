@@ -27,8 +27,8 @@ public class Quantification extends AbstractLexerRule {
 	private int childOffset, childLength;
 
 	@Override
-	protected void init(List<Symbol> symbolBuffer, int lexemeStart, int lexemeLength, Symbol currentSymbol) {
-		super.init(symbolBuffer, lexemeStart, lexemeLength, currentSymbol);
+	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
+		super.onStart(symbolBuffer, lexemeStart);
 		matchCount = 0;
 		childOffset = lexemeStart;
 		childLength = 1;
@@ -36,7 +36,12 @@ public class Quantification extends AbstractLexerRule {
 
 	@Override
 	protected LexemeRef onSymbol() {
-		final LexemeRef lexemeRef = childRule.onSymbol(symbolBuffer, childOffset, childLength, currentSymbol);
+
+		if (childLength == 1) {
+			childRule.onStart(symbolBuffer, childOffset);
+		}
+
+		final LexemeRef lexemeRef = childRule.onSymbol(childLength, currentSymbol);
 		final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength();
 
 		final LexemeState state;
