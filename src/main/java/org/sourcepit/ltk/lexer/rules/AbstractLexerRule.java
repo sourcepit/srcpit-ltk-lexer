@@ -35,7 +35,7 @@ public abstract class AbstractLexerRule implements LexerRule {
 		lexemeLength = length;
 		currentSymbol = symbol;
 
-		final LexemeRef result = onSymbol(offset, length, symbol);
+		final LexemeRef result = onSymbol();
 
 		currentState = result.getState();
 
@@ -50,6 +50,6 @@ public abstract class AbstractLexerRule implements LexerRule {
 		this.currentSymbol = currentSymbol;
 	}
 
-	protected abstract LexemeRef onSymbol(int offset, int length, Symbol symbol);
+	protected abstract LexemeRef onSymbol();
 
 }

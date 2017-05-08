@@ -26,21 +26,6 @@ public class Quantification extends AbstractLexerRule {
 
 	private int childOffset, childLength;
 
-	// @Override
-	// public LexemeRef onSymbol(List<Symbol> buff, int offset, int length,
-	// Symbol symbol) {
-	// if (currentState == LexemeState.INCOMPLETE) {
-	// if (length == 1) {
-	// matchCount = 0;
-	// childOffset = offset;
-	// childLength = 1;
-	// }
-	// return onSymbol(offset, length, symbol);
-	// } else {
-	// return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
-	// }
-	// }
-
 	@Override
 	protected void init(List<Symbol> symbolBuffer, int lexemeStart, int lexemeLength, Symbol currentSymbol) {
 		super.init(symbolBuffer, lexemeStart, lexemeLength, currentSymbol);
@@ -50,8 +35,8 @@ public class Quantification extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
-		final LexemeRef lexemeRef = childRule.onSymbol(symbolBuffer, childOffset, childLength, symbol);
+	protected LexemeRef onSymbol() {
+		final LexemeRef lexemeRef = childRule.onSymbol(symbolBuffer, childOffset, childLength, currentSymbol);
 		final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength();
 
 		final LexemeState state;
@@ -64,29 +49,29 @@ public class Quantification extends AbstractLexerRule {
 		switch (state) {
 		case INCOMPLETE:
 			childLength++;
-			return new LexemeRef(this, LexemeState.INCOMPLETE, offset, length);
+			return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, lexemeLength);
 		case TERMINATED:
 			matchCount++;
 			childOffset += lexemeRef.getLength();
 			childLength = 1;
 			if (max > -1) {
 				if (matchCount == max) {
-					return new LexemeRef(this, LexemeState.TERMINATED, offset, actualLexLength);
+					return new LexemeRef(this, LexemeState.TERMINATED, lexemeStart, actualLexLength);
 				}
 				if (matchCount > max) {
-					return new LexemeRef(this, LexemeState.DISCARDED, offset, actualLexLength);
+					return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, actualLexLength);
 				}
 			}
-			if (actualLexLength < length) {
-				return onSymbol(symbolBuffer, offset, length, symbol);
+			if (actualLexLength < lexemeLength) {
+				return onSymbol();
 			} else {
-				return new LexemeRef(this, LexemeState.INCOMPLETE, offset, actualLexLength);
+				return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, actualLexLength);
 			}
 		case DISCARDED:
 			if (matchCount < min) {
-				return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
+				return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
 			}
-			return new LexemeRef(this, LexemeState.TERMINATED, offset, length - 1);
+			return new LexemeRef(this, LexemeState.TERMINATED, lexemeStart, lexemeLength - 1);
 		default:
 			throw new IllegalStateException();
 		}

@@ -41,43 +41,43 @@ public class Group extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
+	protected LexemeRef onSymbol() {
 		if (ruleIndex == rules.size()) {
-			return new LexemeRef(this, LexemeState.DISCARDED, 0, length);
+			return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
 		}
 
-		final LexemeRef lexemeRef = rule.onSymbol(symbolBuffer, ruleOffset, ruleLength, symbol);
+		final LexemeRef lexemeRef = rule.onSymbol(symbolBuffer, ruleOffset, ruleLength, currentSymbol);
 
 		final LexemeState state = lexemeRef.getState();
 		if (state == LexemeState.INCOMPLETE) {
 			ruleLength++;
-			return new LexemeRef(this, state, offset, length);
+			return new LexemeRef(this, state, lexemeStart, lexemeLength);
 		}
 
 		if (state == LexemeState.DISCARDED) {
-			return new LexemeRef(this, state, offset, length);
+			return new LexemeRef(this, state, lexemeStart, lexemeLength);
 		}
 
 		if (state == LexemeState.TERMINATED) {
 
-			final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - offset;
+			final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - lexemeStart;
 
 			ruleIndex++;
 
 			if (ruleIndex == rules.size()) {
-				return new LexemeRef(this, state, offset, actualLexLength);
+				return new LexemeRef(this, state, lexemeStart, actualLexLength);
 			}
 
 			rule = rules.get(ruleIndex);
 
 			ruleLength = 1;
 
-			if (actualLexLength < length) {
-				ruleOffset = offset + length - 1;
-				return onSymbol(offset, ruleLength, symbol);
+			if (actualLexLength < lexemeLength) {
+				ruleOffset = lexemeStart + lexemeLength - 1;
+				return onSymbol();
 			} else {
-				ruleOffset = offset + length;
-				return new LexemeRef(this, LexemeState.INCOMPLETE, offset, actualLexLength);
+				ruleOffset = lexemeStart + lexemeLength;
+				return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, actualLexLength);
 			}
 
 		}

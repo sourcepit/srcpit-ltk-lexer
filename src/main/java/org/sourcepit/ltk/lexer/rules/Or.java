@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.sourcepit.ltk.lexer.symbols.Symbol;
-
 public class Or extends AbstractLexerRule {
 
 	private final List<LexerRule> rules;
@@ -27,10 +25,10 @@ public class Or extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
+	protected LexemeRef onSymbol() {
 		final List<LexemeRef> prevLexemeRefs;
 
-		if (length == 1) {
+		if (lexemeLength == 1) {
 			terminated = new ArrayList<LexemeRef>();
 			incomplete = new ArrayList<LexemeRef>();
 			prevLexemeRefs = start;
@@ -40,7 +38,8 @@ public class Or extends AbstractLexerRule {
 		}
 
 		for (LexemeRef prevLexemeRef : prevLexemeRefs) {
-			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(symbolBuffer, offset, length, symbol);
+			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(symbolBuffer, lexemeStart, lexemeLength,
+					currentSymbol);
 			LexemeState state = lexemeRef.getState();
 			switch (state) {
 			case DISCARDED:
@@ -57,7 +56,7 @@ public class Or extends AbstractLexerRule {
 		}
 
 		if (!incomplete.isEmpty()) {
-			return new LexemeRef(this, LexemeState.INCOMPLETE, offset, length);
+			return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, lexemeLength);
 		}
 
 		if (!terminated.isEmpty()) {
@@ -80,6 +79,6 @@ public class Or extends AbstractLexerRule {
 					lexemeRef.getLength());
 		}
 
-		return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
+		return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
 	}
 }

@@ -37,13 +37,13 @@ public class SymbolSequenz extends AbstractLexerRule {
 		}
 		return new SymbolSequenz(sequenz);
 	}
-	
+
 	public SymbolSequenz(List<? extends Symbol> symbols) {
 		this.symbols = symbols;
 	}
 
 	@Override
-	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
+	protected LexemeRef onSymbol() {
 		final LexemeRefBuilder result = LexemeRef.builder();
 		result.rule(this);
 		result.state(LexemeState.DISCARDED);
