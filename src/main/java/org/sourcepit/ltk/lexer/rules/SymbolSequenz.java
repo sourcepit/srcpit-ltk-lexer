@@ -12,10 +12,7 @@ import org.sourcepit.ltk.lexer.symbols.ReaderCodePointStream;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 import org.sourcepit.ltk.lexer.symbols.UnicodeCharacter;
 
-import lombok.Value;
-
-@Value
-public class SymbolSequenz implements LexerRule {
+public class SymbolSequenz extends AbstractLexerRule {
 
 	private final List<? extends Symbol> symbols;
 
@@ -40,16 +37,20 @@ public class SymbolSequenz implements LexerRule {
 		}
 		return new SymbolSequenz(sequenz);
 	}
+	
+	public SymbolSequenz(List<? extends Symbol> symbols) {
+		this.symbols = symbols;
+	}
 
 	@Override
-	public LexemeRef onSymbol(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
+	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
 		final LexemeRefBuilder result = LexemeRef.builder();
 		result.rule(this);
 		result.state(LexemeState.DISCARDED);
-		result.offset(offset);
-		result.length(length);
-		if (symbols.size() >= length && symbols.get(length - 1).equals(symbol)) {
-			result.state(symbols.size() == length ? LexemeState.TERMINATED : LexemeState.INCOMPLETE);
+		result.offset(lexemeStart);
+		result.length(lexemeLength);
+		if (symbols.size() >= lexemeLength && symbols.get(lexemeLength - 1).equals(currentSymbol)) {
+			result.state(symbols.size() == lexemeLength ? LexemeState.TERMINATED : LexemeState.INCOMPLETE);
 		}
 		return result.build();
 	}

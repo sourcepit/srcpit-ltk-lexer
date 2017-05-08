@@ -21,7 +21,7 @@ import java.util.List;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 import org.sourcepit.ltk.lexer.symbols.UnicodeCharacter;
 
-public class NoneOf implements LexerRule {
+public class NoneOf extends AbstractLexerRule {
 
 	private final List<UnicodeCharacter> characters;
 
@@ -30,16 +30,16 @@ public class NoneOf implements LexerRule {
 	}
 
 	@Override
-	public LexemeRef onSymbol(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
-		if (length == 1 && symbol instanceof UnicodeCharacter) {
+	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
+		if (lexemeLength == 1 && currentSymbol instanceof UnicodeCharacter) {
 			for (UnicodeCharacter c : characters) {
-				if (c.equals(symbol)) {
-					return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
+				if (c.equals(currentSymbol)) {
+					return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
 				}
 			}
-			return new LexemeRef(this, LexemeState.TERMINATED, offset, length);
+			return new LexemeRef(this, LexemeState.TERMINATED, lexemeStart, lexemeLength);
 		}
-		return new LexemeRef(this, LexemeState.DISCARDED, offset, length);
+		return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
 	}
 
 }

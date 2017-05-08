@@ -27,8 +27,6 @@ import org.sourcepit.ltk.lexer.symbols.SymbolStream;
 
 public abstract class AbstractLexerRuleTest {
 
-	protected LexemeRef prev;
-
 	protected List<Symbol> buff;
 	protected int offset = 0;
 	protected Symbol symbol;
@@ -60,10 +58,9 @@ public abstract class AbstractLexerRuleTest {
 	}
 
 	protected void next() throws IOException {
-		prev = lex;
 		symbol = symbolStream.next();
 		buff.add(symbol);
-		lex = rule.onSymbol(prev, buff, offset, buff.size() - offset, symbol);
+		lex = rule.onSymbol(buff, offset, buff.size() - offset, symbol);
 	}
 
 }

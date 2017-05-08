@@ -75,12 +75,11 @@ public class GroupTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(6, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(7, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -117,12 +116,11 @@ public class GroupTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(4, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(5, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -152,12 +150,11 @@ public class GroupTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(3, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(4, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 
 	}
 	

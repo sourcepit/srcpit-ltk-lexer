@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 
-public class Or implements LexerRule {
+public class Or extends AbstractLexerRule {
 
 	private final List<LexerRule> rules;
 
@@ -27,34 +27,32 @@ public class Or implements LexerRule {
 	}
 
 	@Override
-	public LexemeRef onSymbol(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
-
+	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
 		final List<LexemeRef> prevLexemeRefs;
 
 		if (length == 1) {
 			terminated = new ArrayList<LexemeRef>();
 			incomplete = new ArrayList<LexemeRef>();
 			prevLexemeRefs = start;
-		}
-		else {
+		} else {
 			prevLexemeRefs = new ArrayList<LexemeRef>(incomplete);
 			incomplete = new ArrayList<LexemeRef>();
 		}
 
 		for (LexemeRef prevLexemeRef : prevLexemeRefs) {
-			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(prevLexemeRef, buff, offset, length, symbol);
+			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(symbolBuffer, offset, length, symbol);
 			LexemeState state = lexemeRef.getState();
 			switch (state) {
-				case DISCARDED :
-					break;
-				case INCOMPLETE :
-					incomplete.add(lexemeRef);
-					break;
-				case TERMINATED :
-					terminated.add(lexemeRef);
-					break;
-				default :
-					throw new IllegalArgumentException();
+			case DISCARDED:
+				break;
+			case INCOMPLETE:
+				incomplete.add(lexemeRef);
+				break;
+			case TERMINATED:
+				terminated.add(lexemeRef);
+				break;
+			default:
+				throw new IllegalArgumentException();
 			}
 		}
 
@@ -79,7 +77,7 @@ public class Or implements LexerRule {
 			}
 			final LexemeRef lexemeRef = terminated.get(0);
 			return new LexemeRef(lexemeRef.getRule(), LexemeState.TERMINATED, lexemeRef.getOffset(),
-				lexemeRef.getLength());
+					lexemeRef.getLength());
 		}
 
 		return new LexemeRef(this, LexemeState.DISCARDED, offset, length);

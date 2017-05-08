@@ -28,7 +28,7 @@ public class Lexer {
 		final List<Symbol> buffer = new ArrayList<Symbol>();
 		buffer.add(symbol);
 		do {
-			LexemeRef lexemeRef = rule.onSymbol(null, buffer, 0, buffer.size(), symbol);
+			LexemeRef lexemeRef = rule.onSymbol(buffer, 0, buffer.size(), symbol);
 			LexemeState state = lexemeRef.getState();
 			switch (state) {
 			case DISCARDED:

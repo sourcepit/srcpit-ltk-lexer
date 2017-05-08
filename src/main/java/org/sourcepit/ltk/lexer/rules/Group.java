@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 
-public class Group implements LexerRule {
+public class Group extends AbstractLexerRule {
 
 	private final List<LexerRule> rules;
 
@@ -32,24 +32,21 @@ public class Group implements LexerRule {
 	private LexerRule rule;
 
 	@Override
-	public LexemeRef onSymbol(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
-
-		if (length == 1) {
-			ruleIndex = 0;
-			ruleOffset = offset;
-			ruleLength = 1;
-			rule = rules.get(ruleIndex);
-		}
-
-		return loop(prev, buff, offset, length, symbol);
+	protected void init(List<Symbol> symbolBuffer, int lexemeStart, int lexemeLength, Symbol currentSymbol) {
+		super.init(symbolBuffer, lexemeStart, lexemeLength, currentSymbol);
+		ruleIndex = 0;
+		ruleOffset = lexemeStart;
+		ruleLength = 1;
+		rule = rules.get(ruleIndex);
 	}
 
-	private LexemeRef loop(LexemeRef prev, List<Symbol> buff, int offset, int length, Symbol symbol) {
+	@Override
+	protected LexemeRef onSymbol(int offset, int length, Symbol symbol) {
 		if (ruleIndex == rules.size()) {
 			return new LexemeRef(this, LexemeState.DISCARDED, 0, length);
 		}
 
-		final LexemeRef lexemeRef = rule.onSymbol(prev, buff, ruleOffset, ruleLength, symbol);
+		final LexemeRef lexemeRef = rule.onSymbol(symbolBuffer, ruleOffset, ruleLength, symbol);
 
 		final LexemeState state = lexemeRef.getState();
 		if (state == LexemeState.INCOMPLETE) {
@@ -77,10 +74,8 @@ public class Group implements LexerRule {
 
 			if (actualLexLength < length) {
 				ruleOffset = offset + length - 1;
-				prev = new LexemeRef(this, LexemeState.INCOMPLETE, offset, actualLexLength);
-				return loop(prev, buff, offset, ruleLength, symbol);
-			}
-			else {
+				return onSymbol(offset, ruleLength, symbol);
+			} else {
 				ruleOffset = offset + length;
 				return new LexemeRef(this, LexemeState.INCOMPLETE, offset, actualLexLength);
 			}

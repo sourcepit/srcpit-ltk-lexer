@@ -54,12 +54,11 @@ public class QuantificationTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(2, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(4, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -75,12 +74,11 @@ public class QuantificationTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(0, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(2, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -138,12 +136,11 @@ public class QuantificationTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(2, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(4, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -165,12 +162,11 @@ public class QuantificationTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(2, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(3, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -208,12 +204,11 @@ public class QuantificationTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(2, lex.getLength());
 
-		next();
-
-		assertEquals(rule, lex.getRule());
-		assertEquals(LexemeState.DISCARDED, lex.getState());
-		assertEquals(0, lex.getOffset());
-		assertEquals(3, lex.getLength());
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test

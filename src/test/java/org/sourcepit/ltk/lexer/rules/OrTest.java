@@ -101,6 +101,12 @@ public class OrTest extends AbstractLexerRuleTest {
 		assertEquals(LexemeState.TERMINATED, lex.getState());
 		assertEquals(0, lex.getOffset());
 		assertEquals(3, lex.getLength());
+
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -139,6 +145,12 @@ public class OrTest extends AbstractLexerRuleTest {
 		assertEquals(LexemeState.TERMINATED, lex.getState());
 		assertEquals(0, lex.getOffset());
 		assertEquals(3, lex.getLength());
+
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	@Test
@@ -162,5 +174,11 @@ public class OrTest extends AbstractLexerRuleTest {
 		assertEquals(LexemeState.TERMINATED, lex.getState());
 		assertEquals(2, lex.getOffset());
 		assertEquals(2, lex.getLength());
+
+		try {
+			next();
+			fail();
+		} catch (IllegalStateException e) {
+		}
 	}
 }
