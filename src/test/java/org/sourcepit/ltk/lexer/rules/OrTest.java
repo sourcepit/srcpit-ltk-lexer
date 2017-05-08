@@ -102,7 +102,7 @@ public class OrTest extends AbstractLexerRuleTest {
 		assertEquals(0, lex.getOffset());
 		assertEquals(3, lex.getLength());
 	}
-	
+
 	@Test
 	public void testPrecedence3() throws IOException {
 
@@ -139,5 +139,28 @@ public class OrTest extends AbstractLexerRuleTest {
 		assertEquals(LexemeState.TERMINATED, lex.getState());
 		assertEquals(0, lex.getOffset());
 		assertEquals(3, lex.getLength());
+	}
+
+	@Test
+	public void testOffset() throws Exception {
+		LexerRule rule1 = word("ab");
+		LexerRule rule2 = word("bc");
+		setRule(or(rule1, rule2));
+
+		setInput("xxabbc", 2);
+
+		next();
+
+		assertEquals(rule, lex.getRule());
+		assertEquals(LexemeState.INCOMPLETE, lex.getState());
+		assertEquals(2, lex.getOffset());
+		assertEquals(1, lex.getLength());
+
+		next();
+
+		assertEquals(rule1, lex.getRule());
+		assertEquals(LexemeState.TERMINATED, lex.getState());
+		assertEquals(2, lex.getOffset());
+		assertEquals(2, lex.getLength());
 	}
 }
