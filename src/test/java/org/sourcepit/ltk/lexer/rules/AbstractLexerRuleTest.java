@@ -52,7 +52,7 @@ public abstract class AbstractLexerRuleTest {
 			buff.add(symbolStream.next());
 		}
 
-		lex = new LexemeRef(null, offset == 0 ? LexemeState.INCOMPLETE : LexemeState.TERMINATED, 0, buff.size());
+		lex = null;
 
 		this.offset = offset;
 	}

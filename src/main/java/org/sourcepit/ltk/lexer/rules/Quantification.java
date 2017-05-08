@@ -35,14 +35,16 @@ public class Quantification extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol() {
+	protected LexemeRef onSymbol(Symbol currentSymbol) {
 
 		if (childLength == 1) {
-			childRule.onStart(symbolBuffer, childOffset);
+			childRule.onStart(lexeme.getSymbolBuffer(), childOffset);
 		}
 
+		final int lexemeLength = lexeme.getLength();
+
 		final LexemeRef lexemeRef = childRule.onSymbol(childLength, currentSymbol);
-		final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength();
+		final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - lexeme.getOffset();
 
 		final LexemeState state;
 		if (lexemeRef.getLength() == 0) {
@@ -54,29 +56,39 @@ public class Quantification extends AbstractLexerRule {
 		switch (state) {
 		case INCOMPLETE:
 			childLength++;
-			return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, lexemeLength);
+			lexeme.setState(state);
+			return lexeme;
 		case TERMINATED:
 			matchCount++;
 			childOffset += lexemeRef.getLength();
 			childLength = 1;
 			if (max > -1) {
 				if (matchCount == max) {
-					return new LexemeRef(this, LexemeState.TERMINATED, lexemeStart, actualLexLength);
+					lexeme.setState(LexemeState.TERMINATED);
+					lexeme.setLength(actualLexLength);
+					return lexeme;
 				}
 				if (matchCount > max) {
-					return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, actualLexLength);
+					lexeme.setState(LexemeState.DISCARDED);
+					lexeme.setLength(actualLexLength);
+					return lexeme;
 				}
 			}
 			if (actualLexLength < lexemeLength) {
-				return onSymbol();
+				return onSymbol(currentSymbol);
 			} else {
-				return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, actualLexLength);
+				lexeme.setState(LexemeState.INCOMPLETE);
+				lexeme.setLength(actualLexLength);
+				return lexeme;
 			}
 		case DISCARDED:
 			if (matchCount < min) {
-				return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
+				lexeme.setState(LexemeState.DISCARDED);
+				return lexeme;
 			}
-			return new LexemeRef(this, LexemeState.TERMINATED, lexemeStart, lexemeLength - 1);
+			lexeme.setState(LexemeState.TERMINATED);
+			lexeme.setLength(lexemeLength - 1);
+			return lexeme;
 		default:
 			throw new IllegalStateException();
 		}

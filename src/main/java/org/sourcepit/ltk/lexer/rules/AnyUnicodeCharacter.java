@@ -16,16 +16,18 @@
 
 package org.sourcepit.ltk.lexer.rules;
 
+import org.sourcepit.ltk.lexer.symbols.Symbol;
 import org.sourcepit.ltk.lexer.symbols.UnicodeCharacter;
 
 public class AnyUnicodeCharacter extends AbstractLexerRule {
 
 	@Override
-	protected LexemeRef onSymbol() {
-		if (lexemeLength == 1 && currentSymbol instanceof UnicodeCharacter) {
-			return new LexemeRef(this, LexemeState.TERMINATED, lexemeStart, lexemeLength);
+	protected LexemeRef onSymbol(Symbol symbol) {
+		lexeme.setState(LexemeState.DISCARDED);
+		if (lexeme.getLength() == 1 && symbol instanceof UnicodeCharacter) {
+			lexeme.setState(LexemeState.TERMINATED);
 		}
-		return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
+		return lexeme;
 	}
 
 }

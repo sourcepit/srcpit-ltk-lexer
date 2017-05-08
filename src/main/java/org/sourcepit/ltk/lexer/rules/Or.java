@@ -22,7 +22,10 @@ public class Or extends AbstractLexerRule {
 		this.rules = rules;
 		start = new ArrayList<LexemeRef>(rules.size());
 		for (LexerRule rule : rules) {
-			start.add(new LexemeRef(rule, LexemeState.INCOMPLETE, 0, 0));
+			final LexemeRef lexeme = new LexemeRef();
+			lexeme.setRule(rule);
+			lexeme.setState(LexemeState.INCOMPLETE);
+			start.add(lexeme);
 		}
 	}
 
@@ -35,8 +38,10 @@ public class Or extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol() {
+	protected LexemeRef onSymbol(Symbol symbol) {
 		final List<LexemeRef> prevLexemeRefs;
+
+		final int lexemeLength = lexeme.getLength();
 
 		if (lexemeLength == 1) {
 			terminated = new ArrayList<LexemeRef>();
@@ -48,7 +53,7 @@ public class Or extends AbstractLexerRule {
 		}
 
 		for (LexemeRef prevLexemeRef : prevLexemeRefs) {
-			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(lexemeLength, currentSymbol);
+			LexemeRef lexemeRef = prevLexemeRef.getRule().onSymbol(lexemeLength, symbol);
 			LexemeState state = lexemeRef.getState();
 			switch (state) {
 			case DISCARDED:
@@ -65,7 +70,8 @@ public class Or extends AbstractLexerRule {
 		}
 
 		if (!incomplete.isEmpty()) {
-			return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, lexemeLength);
+			lexeme.setState(LexemeState.INCOMPLETE);
+			return lexeme;
 		}
 
 		if (!terminated.isEmpty()) {
@@ -84,10 +90,15 @@ public class Or extends AbstractLexerRule {
 				});
 			}
 			final LexemeRef lexemeRef = terminated.get(0);
-			return new LexemeRef(lexemeRef.getRule(), LexemeState.TERMINATED, lexemeRef.getOffset(),
-					lexemeRef.getLength());
+			lexeme.setRule(lexemeRef.getRule());
+			lexeme.setState(lexemeRef.getState());
+			lexeme.setOffset(lexemeRef.getOffset());
+			lexeme.setLength(lexemeRef.getLength());
+			return lexeme;
 		}
+		
+		lexeme.setState(LexemeState.DISCARDED);
 
-		return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
+		return lexeme;
 	}
 }

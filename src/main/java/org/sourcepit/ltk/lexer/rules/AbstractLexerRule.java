@@ -1,31 +1,30 @@
 package org.sourcepit.ltk.lexer.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 
 public abstract class AbstractLexerRule implements LexerRule {
 
-	protected LexemeState currentState = LexemeState.INCOMPLETE;
+	protected LexemeRef lexeme;
 
-	protected List<Symbol> symbolBuffer;
-
-	protected int lexemeStart;
-
-	protected int lexemeLength;
-
-	protected Symbol currentSymbol;
+	private List<Symbol> visited;
 
 	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
-		this.currentState = LexemeState.INCOMPLETE;
-		this.symbolBuffer = symbolBuffer;
-		this.lexemeStart = lexemeStart;
+		lexeme = new LexemeRef();
+		lexeme.setRule(this);
+		lexeme.setSymbolBuffer(symbolBuffer);
+		lexeme.setState(LexemeState.INCOMPLETE);
+		lexeme.setOffset(lexemeStart);
+
+		visited = new ArrayList<Symbol>();
 	}
 
 	@Override
 	public final LexemeRef onSymbol(int length, Symbol symbol) {
 
-		switch (currentState) {
+		switch (lexeme.getState()) {
 		case INCOMPLETE:
 			break;
 		case DISCARDED:
@@ -34,16 +33,22 @@ public abstract class AbstractLexerRule implements LexerRule {
 			throw new IllegalStateException();
 		}
 
-		lexemeLength = length;
-		currentSymbol = symbol;
+		lexeme.setLength(lexeme.getLength() + 1);
 
-		final LexemeRef result = onSymbol();
+		if (visited.contains(symbol)) {
 
-		currentState = result.getState();
+			System.out.println(symbol);
+		}
 
-		return result;
+		visited.add(symbol);
+
+		if (lexeme.getLength() != length) {
+			System.out.println();
+		}
+
+		return onSymbol(symbol);
 	}
 
-	protected abstract LexemeRef onSymbol();
+	protected abstract LexemeRef onSymbol(Symbol symbol);
 
 }

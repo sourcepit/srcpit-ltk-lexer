@@ -41,47 +41,53 @@ public class Group extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol() {
+	protected LexemeRef onSymbol(Symbol symbol) {
 		if (ruleIndex == rules.size()) {
-			return new LexemeRef(this, LexemeState.DISCARDED, lexemeStart, lexemeLength);
+			lexeme.setState(LexemeState.DISCARDED);
+			return lexeme;
 		}
 
 		if (ruleLength == 1) {
-			rule.onStart(symbolBuffer, ruleOffset);
+			rule.onStart(lexeme.getSymbolBuffer(), ruleOffset);
 		}
 
-		final LexemeRef lexemeRef = rule.onSymbol(ruleLength, currentSymbol);
+		final LexemeRef lexemeRef = rule.onSymbol(ruleLength, symbol);
 
 		final LexemeState state = lexemeRef.getState();
+		lexeme.setState(state);
+
 		if (state == LexemeState.INCOMPLETE) {
 			ruleLength++;
-			return new LexemeRef(this, state, lexemeStart, lexemeLength);
+			return lexeme;
 		}
 
 		if (state == LexemeState.DISCARDED) {
-			return new LexemeRef(this, state, lexemeStart, lexemeLength);
+			return lexeme;
 		}
 
 		if (state == LexemeState.TERMINATED) {
 
-			final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - lexemeStart;
+			final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - lexeme.getOffset();
 
 			ruleIndex++;
 
 			if (ruleIndex == rules.size()) {
-				return new LexemeRef(this, state, lexemeStart, actualLexLength);
+				lexeme.setLength(actualLexLength);
+				return lexeme;
 			}
 
 			rule = rules.get(ruleIndex);
 
 			ruleLength = 1;
 
-			if (actualLexLength < lexemeLength) {
-				ruleOffset = lexemeStart + lexemeLength - 1;
-				return onSymbol();
+			if (actualLexLength < lexeme.getLength()) {
+				ruleOffset = lexeme.getOffset() + lexeme.getLength() - 1;
+				return onSymbol(symbol);
 			} else {
-				ruleOffset = lexemeStart + lexemeLength;
-				return new LexemeRef(this, LexemeState.INCOMPLETE, lexemeStart, actualLexLength);
+				ruleOffset = lexeme.getOffset() + lexeme.getLength();
+				lexeme.setState(LexemeState.INCOMPLETE);
+				lexeme.setLength(actualLexLength);
+				return lexeme;
 			}
 
 		}

@@ -1,13 +1,16 @@
 package org.sourcepit.ltk.lexer.rules;
 
-import lombok.Builder;
-import lombok.Value;
+import java.util.List;
 
-@Value
-@Builder
+import org.sourcepit.ltk.lexer.symbols.Symbol;
+
+import lombok.Data;
+
+@Data
 public class LexemeRef {
-	LexerRule rule;
-	LexemeState state;
-	int offset;
-	int length;
+	private List<Symbol> symbolBuffer;
+	private LexerRule rule;
+	private LexemeState state;
+	private int offset;
+	private int length;
 }
