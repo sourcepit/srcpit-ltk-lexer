@@ -11,7 +11,7 @@ import org.sourcepit.ltk.lexer.symbols.ReaderCodePointStream;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 import org.sourcepit.ltk.lexer.symbols.UnicodeCharacter;
 
-public class SymbolSequenz extends AbstractLexerRule {
+public class SymbolSequenz extends AbstractLexerRule<Node> {
 
 	private final List<? extends Symbol> symbols;
 
@@ -42,14 +42,18 @@ public class SymbolSequenz extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol(Symbol symbol) {
+	protected Node createNode() {
+		return new Node();
+	}
+
+	@Override
+	protected void onSymbol(Node lexeme, Symbol symbol) {
 		final int lexemeLength = lexeme.getLength();
 		if (symbols.size() >= lexemeLength && symbols.get(lexemeLength - 1).equals(symbol)) {
 			lexeme.setState(symbols.size() == lexemeLength ? LexemeState.TERMINATED : LexemeState.INCOMPLETE);
 		} else {
 			lexeme.setState(LexemeState.DISCARDED);
 		}
-		return lexeme;
 	}
 
 }

@@ -27,7 +27,7 @@ public class LexerTest {
 	@Test
 	public void test() throws Exception {
 
-		List<LexerRule> rules = new ArrayList<>();
+		List<LexerRule<?>> rules = new ArrayList<>();
 
 		rules.add(SymbolSequenz.valueOf("if"));
 		rules.add(SymbolSequenz.valueOf("else"));
@@ -46,7 +46,7 @@ public class LexerTest {
 
 	@Test
 	public void testQuantification() throws Exception {
-		List<LexerRule> rules = new ArrayList<>();
+		List<LexerRule<?>> rules = new ArrayList<>();
 		rules.add(new Quantification(SymbolSequenz.valueOf("ab")));
 		rules.add(SymbolSequenz.valueOf(Eof.get()));
 
@@ -60,7 +60,7 @@ public class LexerTest {
 	@Test
 	public void testNestedQuantification() throws Exception {
 
-		List<LexerRule> rules = new ArrayList<>();
+		List<LexerRule<?>> rules = new ArrayList<>();
 		rules.add(new Quantification(new Quantification(new Quantification(SymbolSequenz.valueOf("abab")))));
 		rules.add(SymbolSequenz.valueOf(Eof.get()));
 
@@ -77,7 +77,7 @@ public class LexerTest {
 
 		// " ( [^\"] | \ . )* "
 
-		List<LexerRule> rules = new ArrayList<>();
+		List<LexerRule<?>> rules = new ArrayList<>();
 		rules.add(group(word("\""), quantified(or(noneOf("\\\""), group(word("\\"), anyChar())), 0, -1), word("\"")));
 		rules.add(eof());
 

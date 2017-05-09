@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class NoneOfTest extends AbstractLexerRuleTest {
+public class NoneOfTest extends AbstractLexerRuleTest<Node> {
 
 	@Test
 	public void testEof() throws IOException {

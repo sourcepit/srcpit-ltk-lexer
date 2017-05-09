@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class GroupTest extends AbstractLexerRuleTest {
+public class GroupTest extends AbstractLexerRuleTest<GroupNode> {
 
 	@Test
 	public void testSimpleGroup() throws IOException {

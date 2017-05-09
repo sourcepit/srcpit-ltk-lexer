@@ -16,78 +16,92 @@
 
 package org.sourcepit.ltk.lexer.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 
-public class Group extends AbstractLexerRule {
+public class Group extends AbstractLexerRule<GroupNode> {
 
-	private final List<LexerRule> rules;
+	private final List<LexerRule<?>> rules;
 
-	public Group(List<LexerRule> rules) {
+	public Group(List<LexerRule<?>> rules) {
 		this.rules = rules;
 	}
 
-	private int ruleIndex, ruleOffset, ruleLength;
-	private LexerRule rule;
-
 	@Override
-	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
-		super.onStart(symbolBuffer, lexemeStart);
-		ruleIndex = 0;
-		ruleOffset = lexemeStart;
-		ruleLength = 1;
-		rule = rules.get(ruleIndex);
+	protected GroupNode createNode() {
+		return new GroupNode(rules, new ArrayList<>(rules.size()));
 	}
 
 	@Override
-	protected LexemeRef onSymbol(Symbol symbol) {
-		if (ruleIndex == rules.size()) {
+	public GroupNode onStart(Node parent, List<Symbol> symbolBuffer, int lexemeStart) {
+		final GroupNode node = super.onStart(parent, symbolBuffer, lexemeStart);
+		node.setRuleIndex(0);
+		node.setRuleOffset(lexemeStart);
+		node.setRuleLength(1);
+		return node;
+	}
+
+	@Override
+	protected void onSymbol(GroupNode lexeme, Symbol symbol) {
+		if (lexeme.getRuleIndex() == rules.size()) {
 			lexeme.setState(LexemeState.DISCARDED);
-			return lexeme;
+			return;
 		}
 
-		if (ruleLength == 1) {
-			rule.onStart(lexeme.getSymbolBuffer(), ruleOffset);
+		final LexerRule<?> rule = rules.get(lexeme.getRuleIndex());
+		foo(lexeme, rule, symbol);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends Node> void foo(GroupNode lexeme, LexerRule<T> rule, Symbol symbol) {
+
+		final T ruleNode;
+		if (lexeme.getRuleLength() == 1) {
+			ruleNode = rule.onStart(lexeme, lexeme.getSymbolBuffer(), lexeme.getRuleOffset());
+			lexeme.getRuleNodes().add(ruleNode);
+		} else {
+			ruleNode = (T) lexeme.getRuleNodes().get(lexeme.getRuleIndex());
 		}
 
-		final LexemeRef lexemeRef = rule.onSymbol(ruleLength, symbol);
+		rule.onSymbol(ruleNode, lexeme.getRuleLength(), symbol);
 
-		final LexemeState state = lexemeRef.getState();
+		final LexemeState state = ruleNode.getState();
 		lexeme.setState(state);
 
 		if (state == LexemeState.INCOMPLETE) {
-			ruleLength++;
-			return lexeme;
+			lexeme.setRuleLength(lexeme.getRuleLength() + 1);
+			return;
 		}
 
 		if (state == LexemeState.DISCARDED) {
-			return lexeme;
+			return;
 		}
 
 		if (state == LexemeState.TERMINATED) {
 
-			final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - lexeme.getOffset();
+			final int actualLexLength = ruleNode.getOffset() + ruleNode.getLength() - lexeme.getOffset();
 
-			ruleIndex++;
+			lexeme.setRuleIndex(lexeme.getRuleIndex() + 1);
 
-			if (ruleIndex == rules.size()) {
+			if (lexeme.getRuleIndex() == rules.size()) {
 				lexeme.setLength(actualLexLength);
-				return lexeme;
+				return;
 			}
 
-			rule = rules.get(ruleIndex);
+			// rule = (LexerRule<T>) lexeme.getRules().get(ruleIndex);
 
-			ruleLength = 1;
-
+			lexeme.setRuleLength(1);
 			if (actualLexLength < lexeme.getLength()) {
-				ruleOffset = lexeme.getOffset() + lexeme.getLength() - 1;
-				return onSymbol(symbol);
+				lexeme.setRuleOffset(lexeme.getOffset() + lexeme.getLength() - 1);
+				onSymbol(lexeme, symbol);
+				return;
 			} else {
-				ruleOffset = lexeme.getOffset() + lexeme.getLength();
+				lexeme.setRuleOffset(lexeme.getOffset() + lexeme.getLength());
 				lexeme.setState(LexemeState.INCOMPLETE);
 				lexeme.setLength(actualLexLength);
-				return lexeme;
+				return;
 			}
 
 		}

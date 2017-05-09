@@ -4,20 +4,23 @@ import java.util.List;
 
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 
-public abstract class AbstractLexerRule implements LexerRule {
-
-	protected LexemeRef lexeme;
-
-	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
-		lexeme = new LexemeRef();
-		lexeme.setRule(this);
-		lexeme.setSymbolBuffer(symbolBuffer);
-		lexeme.setState(LexemeState.INCOMPLETE);
-		lexeme.setOffset(lexemeStart);
-	}
+public abstract class AbstractLexerRule<T extends Node> implements LexerRule<T> {
 
 	@Override
-	public final LexemeRef onSymbol(int length, Symbol symbol) {
+	public T onStart(Node parent, List<Symbol> symbolBuffer, int lexemeStart) {
+		T node = createNode();
+		node.setParent(parent);
+		node.setRule(this);
+		node.setSymbolBuffer(symbolBuffer);
+		node.setState(LexemeState.INCOMPLETE);
+		node.setOffset(lexemeStart);
+		return node;
+	}
+
+	protected abstract T createNode();
+
+	@Override
+	public void onSymbol(T lexeme, int length, Symbol symbol) {
 
 		switch (lexeme.getState()) {
 		case INCOMPLETE:
@@ -30,9 +33,9 @@ public abstract class AbstractLexerRule implements LexerRule {
 
 		lexeme.setLength(lexeme.getLength() + 1);
 
-		return onSymbol(symbol);
+		onSymbol(lexeme, symbol);
 	}
 
-	protected abstract LexemeRef onSymbol(Symbol symbol);
+	protected abstract void onSymbol(T lexeme, Symbol symbol);
 
 }

@@ -25,18 +25,19 @@ import java.util.List;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 import org.sourcepit.ltk.lexer.symbols.SymbolStream;
 
-public abstract class AbstractLexerRuleTest {
+public abstract class AbstractLexerRuleTest<T extends Node> {
 
 	protected List<Symbol> buff;
 	protected int offset = 0;
 	protected Symbol symbol;
-	protected LexemeRef lex;
 
-	protected LexerRule rule;
+	protected LexerRule<T> rule;
 
 	protected SymbolStream symbolStream;
+	
+	protected T lex;
 
-	protected void setRule(LexerRule rule) {
+	protected void setRule(LexerRule<T> rule) {
 		this.rule = rule;
 	}
 
@@ -52,18 +53,16 @@ public abstract class AbstractLexerRuleTest {
 			buff.add(symbolStream.next());
 		}
 
-		lex = null;
-
 		this.offset = offset;
 	}
 
 	protected void next() throws IOException {
 		symbol = symbolStream.next();
 		if (buff.size() == offset) {
-			rule.onStart(buff, offset);
+			lex = rule.onStart(null, buff, offset);
 		}
 		buff.add(symbol);
-		lex = rule.onSymbol(buff.size() - offset, symbol);
+		rule.onSymbol(lex, buff.size() - offset, symbol);
 	}
 
 }

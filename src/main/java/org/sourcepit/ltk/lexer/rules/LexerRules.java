@@ -26,35 +26,35 @@ public final class LexerRules {
 		super();
 	}
 
-	public static LexerRule word(String word) {
+	public static LexerRule<Node> word(String word) {
 		return SymbolSequenz.valueOf(word);
 	}
 
-	public static LexerRule or(LexerRule... rules) {
+	public static LexerRule<OrNode> or(LexerRule<?>... rules) {
 		return new Or(Arrays.asList(rules));
 	}
 
-	public static LexerRule quantified(LexerRule rule, int min, int max) {
+	public static LexerRule<QuantificationNode> quantified(LexerRule<?> rule, int min, int max) {
 		return new Quantification(rule, min, max);
 	}
 
-	public static LexerRule group(LexerRule... rules) {
+	public static LexerRule<GroupNode> group(LexerRule<?>... rules) {
 		return new Group(Arrays.asList(rules));
 	}
 
-	public static LexerRule anyChar() {
+	public static LexerRule<Node> anyChar() {
 		return new AnyUnicodeCharacter();
 	}
 
-	public static LexerRule anyOf(String chars) {
+	public static LexerRule<Node> anyOf(String chars) {
 		return new AnyOf(UnicodeCharacter.toCharacters(chars));
 	}
 
-	public static LexerRule noneOf(String chars) {
+	public static LexerRule<Node> noneOf(String chars) {
 		return new NoneOf(UnicodeCharacter.toCharacters(chars));
 	}
 
-	public static LexerRule eof() {
+	public static LexerRule<Node> eof() {
 		return SymbolSequenz.valueOf(Eof.get());
 	}
 }

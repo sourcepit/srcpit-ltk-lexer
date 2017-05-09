@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class QuantificationTest extends AbstractLexerRuleTest {
+public class QuantificationTest extends AbstractLexerRuleTest<QuantificationNode> {
 
 	@Test
 	public void testSimple() throws IOException {

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 
-public interface LexerRule {
+public interface LexerRule<T extends Node> {
 
-	void onStart(List<Symbol> symbolBuffer, int lexemeStart);
+	T onStart(Node parent, List<Symbol> symbolBuffer, int lexemeStart);
 
-	LexemeRef onSymbol(int length, Symbol symbol);
+	void onSymbol(T node, int length, Symbol symbol);
 }

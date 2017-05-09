@@ -21,7 +21,7 @@ import java.util.List;
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 import org.sourcepit.ltk.lexer.symbols.UnicodeCharacter;
 
-public class AnyOf extends AbstractLexerRule {
+public class AnyOf extends AbstractLexerRule<Node> {
 
 	private final List<UnicodeCharacter> characters;
 
@@ -30,7 +30,12 @@ public class AnyOf extends AbstractLexerRule {
 	}
 
 	@Override
-	protected LexemeRef onSymbol(Symbol symbol) {
+	protected Node createNode() {
+		return new Node();
+	}
+
+	@Override
+	protected void onSymbol(Node lexeme, Symbol symbol) {
 		lexeme.setState(LexemeState.DISCARDED);
 		if (lexeme.getLength() == 1) {
 			for (UnicodeCharacter c : characters) {
@@ -38,7 +43,5 @@ public class AnyOf extends AbstractLexerRule {
 					lexeme.setState(LexemeState.TERMINATED);
 			}
 		}
-		return lexeme;
 	}
-
 }

@@ -1,49 +1,57 @@
 
 package org.sourcepit.ltk.lexer.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sourcepit.ltk.lexer.symbols.Symbol;
 
-public class Quantification extends AbstractLexerRule {
+public class Quantification extends AbstractLexerRule<QuantificationNode> {
 
-	private final LexerRule childRule;
-
+	private final LexerRule<?> childRule;
 	private final int min;
 	private final int max;
 
-	public Quantification(LexerRule childRule) {
+	public Quantification(LexerRule<?> childRule) {
 		this(childRule, 0, -1);
 	}
 
-	public Quantification(LexerRule childRule, int min, int max) {
+	public Quantification(LexerRule<?> childRule, int min, int max) {
 		this.childRule = childRule;
 		this.min = min;
 		this.max = max;
 	}
 
-	private int matchCount;
-
-	private int childOffset, childLength;
-
 	@Override
-	public void onStart(List<Symbol> symbolBuffer, int lexemeStart) {
-		super.onStart(symbolBuffer, lexemeStart);
-		matchCount = 0;
-		childOffset = lexemeStart;
-		childLength = 1;
+	public QuantificationNode onStart(Node parent, List<Symbol> symbolBuffer, int lexemeStart) {
+		final QuantificationNode node = super.onStart(parent, symbolBuffer, lexemeStart);
+		node.setMatchCount(0);
+		node.setChildOffset(lexemeStart);
+		node.setChildLength(1);
+		return node;
 	}
 
 	@Override
-	protected LexemeRef onSymbol(Symbol currentSymbol) {
+	protected QuantificationNode createNode() {
+		return new QuantificationNode(childRule, new ArrayList<>());
+	}
 
-		if (childLength == 1) {
-			childRule.onStart(lexeme.getSymbolBuffer(), childOffset);
+	@SuppressWarnings("unchecked")
+	private <T extends Node> void foo(LexerRule<T> rule, Node lexemeRef, int length, Symbol symbol) {
+		rule.onSymbol((T) lexemeRef, length, symbol);
+	}
+
+	@Override
+	protected void onSymbol(QuantificationNode lexeme, Symbol currentSymbol) {
+
+		if (lexeme.getChildLength() == 1) {
+			final Node childNode = childRule.onStart(lexeme, lexeme.getSymbolBuffer(), lexeme.getChildOffset());
+			lexeme.setChildNode(childNode);
+			lexeme.getChildNodes().add(childNode);
 		}
 
-		final int lexemeLength = lexeme.getLength();
-
-		final LexemeRef lexemeRef = childRule.onSymbol(childLength, currentSymbol);
+		Node lexemeRef = lexeme.getChildNode();
+		foo(childRule, lexemeRef, lexeme.getChildLength(), currentSymbol);
 		final int actualLexLength = lexemeRef.getOffset() + lexemeRef.getLength() - lexeme.getOffset();
 
 		final LexemeState state;
@@ -55,40 +63,41 @@ public class Quantification extends AbstractLexerRule {
 
 		switch (state) {
 		case INCOMPLETE:
-			childLength++;
+			lexeme.setChildLength(lexeme.getChildLength() + 1);
 			lexeme.setState(state);
-			return lexeme;
+			return;
 		case TERMINATED:
-			matchCount++;
-			childOffset += lexemeRef.getLength();
-			childLength = 1;
+			lexeme.setMatchCount(lexeme.getMatchCount() + 1);
+			lexeme.setChildOffset(lexeme.getChildOffset() + lexemeRef.getLength());
+			lexeme.setChildLength(1);
 			if (max > -1) {
-				if (matchCount == max) {
+				if (lexeme.getMatchCount() == max) {
 					lexeme.setState(LexemeState.TERMINATED);
 					lexeme.setLength(actualLexLength);
-					return lexeme;
+					return;
 				}
-				if (matchCount > max) {
+				if (lexeme.getMatchCount() > max) {
 					lexeme.setState(LexemeState.DISCARDED);
 					lexeme.setLength(actualLexLength);
-					return lexeme;
+					return;
 				}
 			}
-			if (actualLexLength < lexemeLength) {
-				return onSymbol(currentSymbol);
+			if (actualLexLength < lexeme.getLength()) {
+				onSymbol(lexeme, currentSymbol);
+				return;
 			} else {
 				lexeme.setState(LexemeState.INCOMPLETE);
 				lexeme.setLength(actualLexLength);
-				return lexeme;
+				return;
 			}
 		case DISCARDED:
-			if (matchCount < min) {
+			if (lexeme.getMatchCount() < min) {
 				lexeme.setState(LexemeState.DISCARDED);
-				return lexeme;
+				return;
 			}
 			lexeme.setState(LexemeState.TERMINATED);
-			lexeme.setLength(lexemeLength - 1);
-			return lexeme;
+			lexeme.setLength(lexeme.getLength() - 1);
+			return;
 		default:
 			throw new IllegalStateException();
 		}

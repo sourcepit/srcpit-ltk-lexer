@@ -25,13 +25,13 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class OrTest extends AbstractLexerRuleTest {
+public class OrTest extends AbstractLexerRuleTest<OrNode> {
 
 	@Test
 	public void testPrecedence1() throws IOException {
 
-		LexerRule rule1 = word("aaa");
-		LexerRule rule2 = quantified(word("a"), 0, -1);
+		LexerRule<?> rule1 = word("aaa");
+		LexerRule<?> rule2 = quantified(word("a"), 0, -1);
 		setRule(or(rule1, rule2));
 
 		setInput("aaa");
@@ -68,8 +68,8 @@ public class OrTest extends AbstractLexerRuleTest {
 	@Test
 	public void testPrecedence2() throws IOException {
 
-		LexerRule rule1 = quantified(word("a"), 0, -1);
-		LexerRule rule2 = word("aaa");
+		LexerRule<?> rule1 = quantified(word("a"), 0, -1);
+		LexerRule<?> rule2 = word("aaa");
 		setRule(or(rule1, rule2));
 
 		setInput("aaa");
@@ -112,8 +112,8 @@ public class OrTest extends AbstractLexerRuleTest {
 	@Test
 	public void testPrecedence3() throws IOException {
 
-		LexerRule rule1 = quantified(word("a"), 0, -1);
-		LexerRule rule2 = word("aa");
+		LexerRule<?> rule1 = quantified(word("a"), 0, -1);
+		LexerRule<?> rule2 = word("aa");
 		setRule(or(rule1, rule2));
 
 		setInput("aaa");
@@ -155,8 +155,8 @@ public class OrTest extends AbstractLexerRuleTest {
 
 	@Test
 	public void testOffset() throws Exception {
-		LexerRule rule1 = word("ab");
-		LexerRule rule2 = word("bc");
+		LexerRule<?> rule1 = word("ab");
+		LexerRule<?> rule2 = word("bc");
 		setRule(or(rule1, rule2));
 
 		setInput("xxabbc", 2);
